@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ⚙️  AUTO REALM CONFIG  —  Ahmed: update these to go live
@@ -29,12 +29,20 @@ const CONFIG = {
   // 📁 PHOTO PATH (upload car photos to /public/fleet-photos/ in your project)
   PHOTO_PATH: "/fleet-photos",
 
-  // 🗺️ GOOGLE PLACES API (optional - for address autocomplete)
-  //    Get key at: https://console.cloud.google.com/apis/credentials
-  //    Enable: Places API (New) + Maps JavaScript API
-  //    Free tier: ~28,000 requests/month
-  //    Leave empty to use plain text inputs
-  GOOGLE_PLACES_API_KEY: "",
+  // 🗺️ GOOGLE MAPS — address/hotel autocomplete in pickup/delivery boxes
+  //    Get key: https://console.cloud.google.com/apis/credentials
+  //    Enable: "Places API (New)" + "Maps JavaScript API"  (free ~28k/mo)
+  //    Leave "" to keep plain text inputs.
+  GOOGLE_MAPS_API_KEY: "",
+
+  // 💬 LIVE CHAT (Tawk.to — free). Admin → Channels → Chat Widget → copy
+  //    the two IDs from the embed URL: embed.tawk.to/PROPERTY_ID/WIDGET_ID
+  TAWK_PROPERTY_ID: "",
+  TAWK_WIDGET_ID: "",
+
+  // 💳 STRIPE (optional) — dashboard.stripe.com → Payment Links is easiest
+  STRIPE_PUBLISHABLE_KEY: "",
+  STRIPE_PAYMENT_LINK: "",
 
   // 📄 RENTAL CONTRACT PDF (upload to /public/ folder of your project)
   CONTRACT_PDF_URL: "/Auto_Realm_Rental_Agreement.pdf",
@@ -173,35 +181,62 @@ const Styles = () => (
 const G = "#BF953F";
 
 const CARS = [
-  { id:1, name:"Mercedes-Benz S580 AMG", sub:"Long Wheelbase · Reclining Package", year:"2024", color:"Obsidian Black", cat:"luxury",
+  { id:1, name:"Mercedes-Benz S580 AMG", sub:"Long Wheelbase · Reclining Package", year:"2024", color:"Obsidian Black", cat:"luxury", drive:"both",
     feats:["S63 AMG Wheels","Reclining Rear Seats","LWB Extended","Cognac Interior","Chauffeur Available"],
-    d:495, w:3000, m:12000, badge:"FLAGSHIP", bc:G,
+    d:495, hr:125, w:3000, m:12000, badge:"FLAGSHIP", bc:G,
     photos:["s580-10-hero-night.jpg","s580-02-prada-luxury.jpg","s580-08-side-night-glow.jpg","s580-09-interior-red.jpg","s580-07-side-day-clouds.jpg","s580-04-interior-cognac.jpg","s580-03-door-open-cognac.jpg","s580-05-interior-rear-cognac.jpg"],
     g1:"#080808", g2:"#181818", acc:"#BF953F" },
-  { id:2, name:"Polaris Slingshot GT", sub:"Limited Edition · #03 of 298 Worldwide", year:"2020", color:"Venom Green", cat:"exotic",
-    feats:["#03 of 298 Worldwide","Underglow Lighting","GT Limited Edition","Open-Cockpit","Bronze Wheels"],
-    d:300, w:2000, m:8000, badge:"#03 / 298 WORLD", bc:"#39FF14",
+  { id:2, name:"Mercedes-AMG G63", sub:"Satin Black on Red · 577HP V8 Biturbo", year:"2024", color:"Satin Black / Red", cat:"suv", drive:"both",
+    feats:["Satin Black on Red","577 HP V8 Biturbo","AMG Performance","G-Manufaktur","Chauffeur Available"],
+    d:895, hr:null, w:null, m:null, badge:"NEW", bc:G,
+    photos:[],
+    g1:"#0a0a0a", g2:"#1a1a1a", acc:"#C0392B" },
+  { id:3, name:"Lamborghini Urus", sub:"Super SUV · Twin-Turbo V8", year:"2023", color:"Nero Black", cat:"exotic", drive:"both",
+    feats:["641 HP Twin-Turbo V8","0-60 in 3.5s","Super SUV","Carbon Package","Chauffeur Available"],
+    d:1200, hr:null, w:null, m:null, badge:"EXOTIC", bc:"#C0392B",
+    photos:[],
+    g1:"#0a0a0a", g2:"#1a1a1a", acc:"#C0392B" },
+  { id:4, name:"Chevrolet Corvette C8", sub:"Mid-Engine · Black on Red", year:"2025", color:"Black / Red", cat:"sport", drive:"self",
+    feats:["Mid-Engine LT2 V8","495 HP","Black on Red Interior","0-60 in 2.9s","Self-Drive"],
+    d:500, hr:null, w:null, m:null, badge:"NEW", bc:"#E63946",
+    photos:[],
+    g1:"#0e0e0e", g2:"#1a1a1a", acc:"#E63946" },
+  { id:5, name:"Range Rover SV", sub:"White on Black · Long Wheelbase", year:"2026", color:"White / Black", cat:"suv", drive:"both",
+    feats:["SV Flagship","White on Black","Long Wheelbase","Executive Rear Seats","Chauffeur Available"],
+    d:null, hr:200, w:null, m:null, badge:"FLAGSHIP SUV", bc:G,
+    transfer:{ jfk:250, ewr:300 },
+    photos:[],
+    g1:"#0a0a0a", g2:"#181818", acc:"#BF953F" },
+  { id:6, name:"Cadillac Escalade ESV", sub:"Premium Luxury · 7-Passenger", year:"2026", color:"Obsidian Black", cat:"suv", drive:"both",
+    feats:["Premium Luxury ESV","7 Passenger","Self-Drive or Chauffeur","Airport Transfers","Super Cruise"],
+    d:500, hr:150, w:null, m:null, badge:"NEW", bc:G,
+    photos:[],
+    g1:"#080808", g2:"#161616", acc:"#BF953F" },
+  { id:7, name:"BMW M3 Competition", sub:"Stage 1 Tune · Starlight Headliner", year:"2023", color:"Black", cat:"sport", drive:"self",
+    feats:["Stage 1 Tuned","Starlight Headliner","510+ HP","Competition Package","Self-Drive"],
+    d:495, hr:null, w:null, m:null, badge:"STAGE 1", bc:"#3A5BDB",
+    photos:[],
+    g1:"#060810", g2:"#0e1020", acc:"#3A5BDB" },
+  { id:8, name:"Polaris Slingshot GT", sub:"Limited Edition · #03 of 298 Worldwide", year:"2020", color:"Venom Green", cat:"exotic", drive:"self",
+    feats:["#03 of 298 Worldwide","Underglow Lighting","GT Limited Edition","Open-Cockpit","2-Day Minimum"],
+    d:300, hr:null, w:2000, m:8000, badge:"#03 / 298 WORLD", bc:"#39FF14", minDays:2,
     photos:["slingshot-01-hero.jpg","slingshot-04-underglow-multi.jpg","slingshot-02-side.jpg","slingshot-03-front.jpg","slingshot-05-underglow-purple.jpg","slingshot-06-underglow-blue.jpg"],
     g1:"#040e04", g2:"#081c08", acc:"#39FF14" },
-  { id:3, name:"Mercedes-Benz C63S AMG", sub:"V8 Biturbo · AMG Performance Coupe", year:"2019", color:"Diamond White", cat:"sport",
+  { id:9, name:"Mercedes-Benz C63S AMG", sub:"V8 Biturbo · AMG Performance Coupe", year:"2019", color:"Diamond White", cat:"sport", drive:"self",
     feats:["V8 Biturbo 503 HP","Red & Black AMG Interior","AMG Performance Seats","Panoramic Roof","Star Lights Roof"],
-    d:400, w:2500, m:9000, badge:null,
+    d:400, hr:null, w:2500, m:9000, badge:null,
     photos:["c63s-01-nyc-louis-vuitton.jpg","c63s-02-front-day.jpg","c63s-03-side-day.jpg","c63s-04-interior-amg.jpg","c63s-05-interior-seats.jpg"],
     g1:"#0e0e0e", g2:"#1a1a1a", acc:"#E63946" },
-  { id:4, name:"BMW M850i Competition", sub:"Fully Blacked Out · M Performance", year:"2019", color:"Triple Black", cat:"sport",
+  { id:10, name:"BMW M850i Competition", sub:"Fully Blacked Out · M Performance", year:"2019", color:"Triple Black", cat:"sport", drive:"self",
     feats:["Fully Blacked Out","M Sport Package","Crystal Shifter","Cognac Interior","523 HP V8"],
-    d:350, w:2250, m:9000, badge:null,
+    d:350, hr:null, w:2250, m:9000, badge:null,
     photos:["m850-01-hero-day.jpg","m850-03-front-sunset.jpg","m850-02-rear-day.jpg","m850-05-interior.jpg","m850-04-taillight.jpg","m850-06-headlight.jpg","m850-07-shifter.jpg"],
     g1:"#060810", g2:"#0e1020", acc:"#3A5BDB" },
-  { id:5, name:"Range Rover Sport SVR", sub:"Estoril Blue · Supercharged V8 575HP", year:"2017", color:"Estoril Blue", cat:"suv",
+  { id:11, name:"Range Rover Sport SVR", sub:"Estoril Blue · Supercharged V8 575HP", year:"2017", color:"Estoril Blue", cat:"suv", drive:"self",
     feats:["Supercharged V8 575HP","SVR Performance Seats","Panoramic Roof","Carbon Trim","Active Sport Exhaust"],
-    d:375, w:2500, m:10000, badge:null,
+    d:375, hr:null, w:2500, m:10000, badge:null,
     photos:["svr-01-driveway-hero.jpg","svr-02-front-grille.jpg","svr-03-rear-quarter.jpg","svr-04-svr-seats.jpg","svr-05-svr-seats-detail.jpg"],
     g1:"#0a1428", g2:"#142850", acc:"#2E5BFF" },
-  { id:6, name:"Cadillac Escalade", sub:"7-Passenger Premium SUV", year:null, color:"Obsidian Black", cat:"suv",
-    feats:["7 Passenger","Self-Drive Available","Chauffeur Available","Airport Transfers","Premium Sound"],
-    d:395, w:null, m:null, badge:null, photos:[],
-    g1:"#080808", g2:"#161616", acc:"#888" },
 ];
 
 const CATS = [
@@ -213,6 +248,44 @@ const TRANSFERS = [
   { route:"JFK ↔ City", s580:185, esc:200 },
   { route:"LGA ↔ City", s580:150, esc:175 },
   { route:"Newark ↔ City", s580:215, esc:255 },
+];
+
+// First / Business class airport transfer tiers
+const TRANSFER_CLASSES = {
+  first: {
+    label:"First Class",
+    tag:"Range Rover · S580 · Escalade",
+    desc:"Arrive in flagship luxury. Our top-tier fleet with premium amenities and a professional chauffeur.",
+    rates:[
+      { route:"JFK ↔ NYC", price:"From $250" },
+      { route:"LGA ↔ NYC", price:"From $200" },
+      { route:"EWR ↔ NYC", price:"From $300" },
+    ],
+  },
+  business: {
+    label:"Business Class",
+    tag:"E-Class · Chevy Suburban",
+    desc:"Professional, comfortable, and reliable. Ideal for business travel and everyday airport runs.",
+    rates:[
+      { route:"JFK ↔ NYC", price:"From $175" },
+      { route:"LGA ↔ NYC", price:"From $150" },
+      { route:"EWR ↔ NYC", price:"From $215" },
+    ],
+  },
+};
+
+// 5 SEO-optimized service buttons
+const SERVICES = [
+  { id:"exotic",    icon:"🔑", label:"Exotic Rentals",    seo:"Luxury & Exotic Car Rental",
+    desc:"Self-drive supercars, luxury sedans & SUVs.", svc:"rental", target:"fleet" },
+  { id:"chauffeur", icon:"🤵", label:"Hourly Chauffeur",  seo:"Private Chauffeur & Black Car Service",
+    desc:"Professional drivers by the hour, any occasion.", svc:"chauffeur", target:null },
+  { id:"airport",   icon:"✈️", label:"Airport Transfers", seo:"Airport Transfers — JFK · LGA · EWR",
+    desc:"First-class & business-class airport rides.", svc:"transfer", target:"transfers" },
+  { id:"ondemand",  icon:"🚐", label:"Car on Demand",     seo:"Any Vehicle On Demand",
+    desc:"Party buses, limos, Sprinters, jets & more.", svc:"ondemand", target:null },
+  { id:"import",    icon:"🌐", label:"Japanese Imports",  seo:"JDM & Exotic Import Service",
+    desc:"Source & ship your dream JDM or exotic.", svc:"import", target:"imports" },
 ];
 
 const PROMS = [
@@ -231,6 +304,83 @@ const Sec = ({ id, style, children }) => (
     <div style={{ maxWidth:1200, margin:"0 auto" }}>{children}</div>
   </section>
 );
+
+/* ═════════ Google Maps loader (only if key set) ═════════ */
+let _mapsPromise = null;
+function loadGoogleMaps() {
+  if (!CONFIG.GOOGLE_MAPS_API_KEY) return Promise.reject("no-key");
+  if (_mapsPromise) return _mapsPromise;
+  _mapsPromise = new Promise((resolve, reject) => {
+    if (window.google?.maps?.places) return resolve(window.google);
+    const s = document.createElement("script");
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places`;
+    s.async = true; s.defer = true;
+    s.onload = () => resolve(window.google);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return _mapsPromise;
+}
+
+/* ═════════ Smart address input — autocompletes hotels/addresses,
+   falls back to plain text if no Maps key ═════════ */
+function AddressInput({ value, onChange, placeholder, style }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!CONFIG.GOOGLE_MAPS_API_KEY) return;
+    let ac;
+    loadGoogleMaps().then((g) => {
+      if (!ref.current) return;
+      ac = new g.maps.places.Autocomplete(ref.current, {
+        fields: ["formatted_address", "name"],
+        componentRestrictions: { country: ["us"] },
+      });
+      ac.addListener("place_changed", () => {
+        const p = ac.getPlace();
+        const txt = p.name && p.formatted_address && !p.formatted_address.startsWith(p.name)
+          ? `${p.name}, ${p.formatted_address}` : (p.formatted_address || p.name || "");
+        onChange(txt);
+      });
+    }).catch(() => {});
+    return () => { if (ac && window.google) window.google.maps.event.clearInstanceListeners(ac); };
+  }, []);
+  return (
+    <input ref={ref} value={value} style={style}
+      placeholder={placeholder || (CONFIG.GOOGLE_MAPS_API_KEY ? "Start typing a hotel or address…" : "Enter address")}
+      onChange={(e)=>onChange(e.target.value)} autoComplete="off" />
+  );
+}
+
+/* ═════════ Live chat (Tawk.to) — loads only if IDs present ═════════ */
+function useLiveChat() {
+  useEffect(() => {
+    if (!CONFIG.TAWK_PROPERTY_ID) return;
+    const wid = CONFIG.TAWK_WIDGET_ID || "default";
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_LoadStart = new Date();
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = `https://embed.tawk.to/${CONFIG.TAWK_PROPERTY_ID}/${wid}`;
+    s.charset = "UTF-8"; s.setAttribute("crossorigin", "*");
+    document.body.appendChild(s);
+  }, []);
+}
+
+/* ═════════ File upload box ═════════ */
+function UploadBox({ label, file, onFile }) {
+  const ref = useRef(null);
+  return (
+    <div>
+      <label>{label}</label>
+      <div onClick={()=>ref.current?.click()} style={{ border:`1px ${file?"solid #1e7e34":"dashed #2a2a2a"}`, borderRadius:8, padding:16, textAlign:"center", cursor:"pointer", background:file?"rgba(30,126,52,.06)":"#0c0c0c", transition:"all .3s" }}>
+        <input ref={ref} type="file" accept="image/*,.pdf" style={{ display:"none" }} onChange={(e)=>onFile(e.target.files[0]||null)} />
+        {file
+          ? <div style={{ fontSize:12, color:"#1e7e34" }}>✓ <span style={{ color:"#ccc" }}>{file.name}</span></div>
+          : <div style={{ fontSize:12, color:"#555" }}>📎 Tap to upload <span style={{color:"#777"}}>(photo or PDF)</span></div>}
+      </div>
+    </div>
+  );
+}
 
 function FleetCard({ car, per, plabel, price, onBook }) {
   const [idx, setIdx] = useState(0);
@@ -279,11 +429,18 @@ function FleetCard({ car, per, plabel, price, onBook }) {
         </div>
         <div style={{ borderTop:"1px solid #161616", paddingTop:18, display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:12 }}>
           <div>
-            <div style={{ fontSize:10, color:"#3a3a3a", letterSpacing:".1em", textTransform:"uppercase", marginBottom:3 }}>{["Daily Rate","Weekly Rate","Monthly Rate"][per]}</div>
-            <div style={{ display:"flex", alignItems:"baseline", gap:5 }}>
-              <span className="sr gold-text" style={{ fontSize:30, fontWeight:600 }}>{price}</span>
-              {!["—","Inquire"].includes(price) && <span style={{ fontSize:12, color:"#444" }}>{plabel}</span>}
+            <div style={{ fontSize:10, color:"#3a3a3a", letterSpacing:".1em", textTransform:"uppercase", marginBottom:3 }}>
+              {car.d ? ["Daily Rate","Weekly Rate","Monthly Rate"][per] : car.hr ? "Chauffeur / Hr" : "Rate"}
             </div>
+            <div style={{ display:"flex", alignItems:"baseline", gap:5 }}>
+              <span className="sr gold-text" style={{ fontSize:30, fontWeight:600 }}>
+                {car.d ? price : car.hr ? `$${car.hr.toLocaleString()}` : "Inquire"}
+              </span>
+              <span style={{ fontSize:12, color:"#444" }}>{car.d ? plabel : car.hr ? "/hr" : ""}</span>
+            </div>
+            {car.hr && car.d && <div style={{ fontSize:10, color:"#555", marginTop:4 }}>+ chauffeur ${car.hr.toLocaleString()}/hr</div>}
+            {car.transfer && <div style={{ fontSize:10, color:"#555", marginTop:4 }}>JFK ${car.transfer.jfk} · EWR ${car.transfer.ewr}</div>}
+            {car.minDays && <div style={{ fontSize:10, color:G, marginTop:4 }}>⚠ {car.minDays}-day minimum</div>}
           </div>
           <button className="btn-gold" style={{ padding:"10px 20px", borderRadius:6, fontSize:11, flexShrink:0 }} onClick={()=>onBook(car,"rental")}>Book Now</button>
         </div>
@@ -307,7 +464,7 @@ function OnDemandCard({ onClick }) {
         Tell us what you want. Lamborghini, Ferrari, Rolls Royce, G-Wagon, Bentley — we source any luxury or exotic car on request.
       </p>
       <button className="btn-gold" style={{ padding:"12px 28px", borderRadius:6, fontSize:11 }}>Submit Inquiry →</button>
-      <div style={{ marginTop:22, fontSize:10, color:"#444", letterSpacing:".06em" }}>Average response time: under 2 hours</div>
+      <div style={{ marginTop:22, fontSize:10, color:"#444", letterSpacing:".06em" }}>Average response time: under 5 minutes</div>
     </div>
   );
 }
@@ -325,6 +482,12 @@ function BookModal({ open, onClose, initCar, initSvc }) {
     pickup:"", pickupZip:"", dropoff:"", dropoffZip:"",
     date:"", time:"", returnDate:"", returnTime:"", hours:"3", pax:"1",
     itinerary:"",
+    // New: fulfillment + drive mode + transfer class + driver age
+    fulfillment:"pickup",     // pickup | delivery (exotic/luxury)
+    driveMode:"self",         // self | chauffeur (for "both" cars)
+    transferClass:"first",    // first | business (airport)
+    driverAge:"",
+    showTrip:false,           // optional trip details toggle for self-drive
     // Customer
     name:"", phone:"", email:"", notes:"",
     // Rental contract / documents
@@ -340,7 +503,17 @@ function BookModal({ open, onClose, initCar, initSvc }) {
   const isCarRequest = isOnDemand || isImport;
   const isChauffeur = form.service === "chauffeur" || form.service === "fifa";
   const isRental = form.service === "rental";
+  const isTransfer = form.service === "transfer";
   const totalSteps = isRental ? 4 : 3;
+
+  // Identify the selected car & its drive type for conditional flows
+  const selectedCar = initCar || CARS.find(c => c.name === form.vehicle) || null;
+  const carIsBoth = selectedCar?.drive === "both";
+  const carIsSelfOnly = selectedCar?.drive === "self";
+  const effectiveDrive = carIsSelfOnly ? "self" : (carIsBoth ? form.driveMode : (selectedCar?.drive || "self"));
+  const isExoticLux = isRental && selectedCar && (selectedCar.cat === "exotic" || selectedCar.cat === "luxury");
+  // ID + insurance only for self-drive rentals
+  const needsDocs = isRental && effectiveDrive === "self";
 
   const submit = async () => {
     setSubmitting(true);
@@ -350,6 +523,10 @@ function BookModal({ open, onClose, initCar, initSvc }) {
       service: form.service,
       vehicle: isCarRequest ? `${form.carYear} ${form.carMake} ${form.carModel} (${form.carColor})`.trim() : form.vehicle,
       car_make: form.carMake, car_model: form.carModel, car_year: form.carYear, car_color: form.carColor, car_notes: form.carNotes,
+      drive_mode: carIsBoth ? form.driveMode : (selectedCar?.drive || "—"),
+      fulfillment: isExoticLux ? form.fulfillment : "—",
+      transfer_class: isTransfer ? TRANSFER_CLASSES[form.transferClass].label : "—",
+      driver_age: form.driverAge || "—",
       pickup: form.pickup + (form.pickupZip ? `, ${form.pickupZip}` : ""),
       dropoff: form.dropoff + (form.dropoffZip ? `, ${form.dropoffZip}` : ""),
       date: form.date, time: form.time,
@@ -377,7 +554,8 @@ function BookModal({ open, onClose, initCar, initSvc }) {
     setStep(initSvc?2:1); setSuccess(false); setSubmitting(false);
     setForm({ service:initSvc||"rental", vehicle:"", carMake:"", carModel:"", carYear:"", carColor:"", carNotes:"",
       pickup:"", pickupZip:"", dropoff:"", dropoffZip:"", date:"", time:"", returnDate:"", returnTime:"", hours:"3", pax:"1",
-      itinerary:"", name:"", phone:"", email:"", notes:"",
+      itinerary:"", fulfillment:"pickup", driveMode:"self", transferClass:"first", driverAge:"", showTrip:false,
+      name:"", phone:"", email:"", notes:"",
       licenseFront:null, licenseBack:null, insuranceDoc:null,
       signatureName:"", signatureDate:new Date().toISOString().split("T")[0], agreedToTerms:false });
     onClose();
@@ -411,7 +589,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
             <div style={{ fontSize:54, marginBottom:18 }}>✓</div>
             <h3 className="sr gold-text" style={{ fontSize:30, fontWeight:500, marginBottom:14 }}>Inquiry Received</h3>
             <p style={{ color:"#777", fontSize:14, lineHeight:1.8, marginBottom:30, maxWidth:380, margin:"0 auto 30px" }}>
-              Thank you {form.name?.split(" ")[0]}. We'll reach out within 60 minutes to confirm details.
+              Thank you {form.name?.split(" ")[0]}. We'll reach out within 5 minutes to confirm details.
             </p>
             <div style={{ background:"#080808", border:"1px solid #181818", borderRadius:8, padding:"16px 22px", marginBottom:24, fontSize:12, color:"#555", lineHeight:1.8 }}>
               📧 Confirmation to <span style={{color:"#aaa"}}>{form.email}</span><br/>
@@ -424,7 +602,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
             <div style={{marginBottom:24}}>
               <div style={stag}>Auto Realm</div>
               <h3 className="sr" style={{fontSize:26, fontWeight:400, marginTop:6}}>
-                {step===1?"Choose Service":isCarRequest?(isOnDemand?"Car on Demand":"JDM Import Inquiry"):step===2?"Trip Details":step===3?"Your Info":"Documents & Contract"}
+                {step===1?"Choose Service":isOnDemand?"Desired Vehicle":isImport?"Import Inquiry":step===2?"Trip Details":step===3?"Your Info":"Documents & Contract"}
               </h3>
               <div style={{display:"flex",gap:6,marginTop:14}}>
                 {Array.from({length:totalSteps}).map((_,i)=>{
@@ -501,17 +679,25 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                 </div>
 
                 {isOnDemand && (
-                  <div><label>When do you need it?</label>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                      <input type="date" value={form.date} onChange={e=>u("date",e.target.value)} style={{colorScheme:"dark"}}/>
-                      <select value={form.hours} onChange={e=>u("hours",e.target.value)}>
-                        <option>1 day</option><option>2-3 days</option><option>1 week</option><option>2 weeks</option><option>1 month+</option>
-                      </select>
+                  <>
+                    <div><label>When do you need it?</label>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                        <input type="date" value={form.date} onChange={e=>u("date",e.target.value)} style={{colorScheme:"dark"}}/>
+                        <select value={form.hours} onChange={e=>u("hours",e.target.value)}>
+                          <option>1 day</option><option>2-3 days</option><option>1 week</option><option>2 weeks</option><option>1 month+</option>
+                        </select>
+                      </div>
                     </div>
-                  </div>
+                    <div><label>Pickup / Event Location</label>
+                      <AddressInput value={form.pickup} onChange={v=>u("pickup",v)} placeholder="Hotel, venue, or address…" />
+                    </div>
+                    <div><label>Trip Details</label>
+                      <textarea placeholder="Where you're going, number of passengers, occasion, timing…" rows={3} value={form.itinerary} onChange={e=>u("itinerary",e.target.value)} style={{resize:"vertical"}}/>
+                    </div>
+                  </>
                 )}
 
-                <div><label>Additional Specs / Notes</label>
+                <div><label>{isImport ? "Specs / Budget / Notes" : "Additional Specs / Notes"}</label>
                   <textarea placeholder={isImport ? "Trim level, RHD/LHD, mileage limit, mods, budget range…" : "Special requests, trim, additional details…"} rows={3} value={form.carNotes} onChange={e=>u("carNotes",e.target.value)} style={{resize:"vertical"}}/>
                 </div>
 
@@ -535,39 +721,59 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                   </div>
                 )}
 
-                <div style={{display:"grid",gridTemplateColumns:"3fr 1fr",gap:12}}>
-                  <div><label>Pickup Address *</label>
-                    <input placeholder="Street address, hotel, or venue…" value={form.pickup} onChange={e=>u("pickup",e.target.value)}/>
-                  </div>
-                  <div><label>ZIP</label>
-                    <input placeholder="10001" value={form.pickupZip} onChange={e=>u("pickupZip",e.target.value)} maxLength={5}/>
-                  </div>
-                </div>
-
-                {(isChauffeur||form.service==="transfer") && (
-                  <div style={{display:"grid",gridTemplateColumns:"3fr 1fr",gap:12}}>
-                    <div><label>Dropoff / Destination</label>
-                      <input placeholder="Airport, address, or venue…" value={form.dropoff} onChange={e=>u("dropoff",e.target.value)}/>
-                    </div>
-                    <div><label>ZIP</label>
-                      <input placeholder="11430" value={form.dropoffZip} onChange={e=>u("dropoffZip",e.target.value)} maxLength={5}/>
+                {/* DRIVE MODE toggle — only for cars available both ways */}
+                {isRental && carIsBoth && (
+                  <div><label>How will you drive?</label>
+                    <div style={{display:"flex",gap:8}}>
+                      {[["self","Self-Drive"],["chauffeur","With Chauffeur"]].map(([v,l])=>(
+                        <button key={v} onClick={()=>u("driveMode",v)} style={{flex:1,padding:"11px",borderRadius:8,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",border:`1px solid ${form.driveMode===v?G:"#1e1e1e"}`,background:form.driveMode===v?"rgba(191,149,63,.12)":"rgba(255,255,255,.02)",color:form.driveMode===v?G:"#888",fontWeight:form.driveMode===v?600:400,transition:"all .2s"}}>{l}</button>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {form.service==="rental" && (
-                  <div style={{display:"grid",gridTemplateColumns:"3fr 1fr",gap:12}}>
-                    <div><label>Return Location</label>
-                      <input placeholder="Return address…" value={form.dropoff} onChange={e=>u("dropoff",e.target.value)}/>
+                {/* PICKUP / DELIVERY toggle — exotic & luxury */}
+                {isExoticLux && (
+                  <div><label>Pickup or Delivery?</label>
+                    <div style={{display:"flex",gap:8}}>
+                      {[["pickup","I'll Pick Up"],["delivery","Deliver to Me"]].map(([v,l])=>(
+                        <button key={v} onClick={()=>u("fulfillment",v)} style={{flex:1,padding:"11px",borderRadius:8,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",border:`1px solid ${form.fulfillment===v?G:"#1e1e1e"}`,background:form.fulfillment===v?"rgba(191,149,63,.12)":"rgba(255,255,255,.02)",color:form.fulfillment===v?G:"#888",fontWeight:form.fulfillment===v?600:400,transition:"all .2s"}}>{l}</button>
+                      ))}
                     </div>
-                    <div><label>ZIP</label>
-                      <input placeholder="10001" value={form.dropoffZip} onChange={e=>u("dropoffZip",e.target.value)} maxLength={5}/>
+                  </div>
+                )}
+
+                {/* TRANSFER CLASS toggle */}
+                {isTransfer && (
+                  <div><label>Service Class</label>
+                    <div style={{display:"flex",gap:8}}>
+                      {[["first","First Class"],["business","Business Class"]].map(([v,l])=>(
+                        <button key={v} onClick={()=>u("transferClass",v)} style={{flex:1,padding:"11px",borderRadius:8,fontSize:12,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",border:`1px solid ${form.transferClass===v?G:"#1e1e1e"}`,background:form.transferClass===v?"rgba(191,149,63,.12)":"rgba(255,255,255,.02)",color:form.transferClass===v?G:"#888",fontWeight:form.transferClass===v?600:400,transition:"all .2s"}}>{l}</button>
+                      ))}
                     </div>
+                    <p style={{fontSize:11,color:"#666",marginTop:8,lineHeight:1.6}}>{TRANSFER_CLASSES[form.transferClass].tag} — {TRANSFER_CLASSES[form.transferClass].desc}</p>
+                  </div>
+                )}
+
+                {/* Pickup vs Delivery address (exotic/lux delivery) */}
+                {isExoticLux && form.fulfillment==="delivery" ? (
+                  <div><label>Delivery Address *</label>
+                    <AddressInput value={form.pickup} onChange={v=>u("pickup",v)} placeholder="Where should we deliver the car?" />
+                  </div>
+                ) : (
+                  <div><label>{isTransfer ? "Pickup Address / Hotel *" : "Pickup Location *"}</label>
+                    <AddressInput value={form.pickup} onChange={v=>u("pickup",v)} placeholder="Hotel, address, or venue…" />
+                  </div>
+                )}
+
+                {(isChauffeur||isTransfer) && (
+                  <div><label>{isTransfer ? "Airport / Destination" : "Dropoff / Destination"}</label>
+                    <AddressInput value={form.dropoff} onChange={v=>u("dropoff",v)} placeholder={isTransfer?"JFK, LGA, or EWR":"Airport, address, or venue…"} />
                   </div>
                 )}
 
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                  <div><label>Date *</label>
+                  <div><label>{isRental?"Pickup Date *":"Date *"}</label>
                     <input type="date" value={form.date} onChange={e=>u("date",e.target.value)} style={{colorScheme:"dark"}}/>
                   </div>
                   <div><label>Time *</label>
@@ -575,15 +781,22 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                   </div>
                 </div>
 
-                {form.service==="rental" && (
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                    <div><label>Return Date</label>
-                      <input type="date" value={form.returnDate} onChange={e=>u("returnDate",e.target.value)} style={{colorScheme:"dark"}}/>
+                {isRental && (
+                  <>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                      <div><label>Return Date</label>
+                        <input type="date" value={form.returnDate} onChange={e=>u("returnDate",e.target.value)} style={{colorScheme:"dark"}}/>
+                      </div>
+                      <div><label>Return Time</label>
+                        <input type="time" value={form.returnTime} onChange={e=>u("returnTime",e.target.value)} style={{colorScheme:"dark"}}/>
+                      </div>
                     </div>
-                    <div><label>Return Time</label>
-                      <input type="time" value={form.returnTime} onChange={e=>u("returnTime",e.target.value)} style={{colorScheme:"dark"}}/>
-                    </div>
-                  </div>
+                    {selectedCar?.minDays && (
+                      <div style={{fontSize:11,color:G,background:"rgba(191,149,63,.06)",border:"1px solid rgba(191,149,63,.18)",borderRadius:8,padding:"9px 12px"}}>
+                        ⓘ This vehicle has a <b>{selectedCar.minDays}-day minimum</b> rental.
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {isChauffeur && (
@@ -594,17 +807,39 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                   </div>
                 )}
 
+                {/* CHAUFFEUR: trip details / itinerary (always) */}
                 {isChauffeur && (
                   <div>
                     <label>Itinerary <span style={{textTransform:"none",color:"#555"}}>(stops & schedule)</span></label>
                     <textarea
-                      placeholder="e.g. 5:00 PM — Pickup at Plaza Hotel · 6:00 PM — Dinner at Tao Downtown · 9:00 PM — Drinks at 1 OAK · 12:00 AM — Drop-off at hotel"
-                      rows={4}
-                      value={form.itinerary}
-                      onChange={e=>u("itinerary",e.target.value)}
-                      style={{resize:"vertical"}}
+                      placeholder="e.g. 5:00 PM — Pickup at Plaza Hotel · 6:00 PM — Dinner at Tao · 9:00 PM — Drinks · 12:00 AM — Drop-off"
+                      rows={4} value={form.itinerary} onChange={e=>u("itinerary",e.target.value)} style={{resize:"vertical"}}
                     />
-                    <p style={{fontSize:11,color:"#555",marginTop:6}}>Tell us your plan — venues, stops, timing. The chauffeur will follow your schedule.</p>
+                    <p style={{fontSize:11,color:"#555",marginTop:6}}>Tell us your plan — venues, stops, timing. Your chauffeur will follow it.</p>
+                  </div>
+                )}
+
+                {/* RENTAL self-drive: driver age + ID + insurance. NO trip details for exotic (optional toggle) */}
+                {needsDocs && (
+                  <>
+                    <div><label>Driver Age *</label>
+                      <input placeholder="Must be 21+" value={form.driverAge} onChange={e=>u("driverAge",e.target.value)}/>
+                    </div>
+                    <UploadBox label="Driver's License *" file={form.licenseFront} onFile={f=>u("licenseFront",f)} />
+                    <UploadBox label="Full-Coverage Insurance *" file={form.insuranceDoc} onFile={f=>u("insuranceDoc",f)} />
+                    <div>
+                      <button className="btn-white" style={{padding:"9px 16px",borderRadius:8,fontSize:10}} onClick={()=>u("showTrip",!form.showTrip)}>
+                        {form.showTrip?"− Hide":"+ Add"} trip details (optional)
+                      </button>
+                      {form.showTrip && <textarea style={{marginTop:10}} rows={2} value={form.itinerary} onChange={e=>u("itinerary",e.target.value)} placeholder="Anything we should know about your trip…"/>}
+                    </div>
+                  </>
+                )}
+
+                {/* RENTAL with chauffeur: itinerary instead of docs */}
+                {isRental && effectiveDrive==="chauffeur" && (
+                  <div><label>Itinerary / Trip Details</label>
+                    <textarea rows={3} value={form.itinerary} onChange={e=>u("itinerary",e.target.value)} placeholder="Your stops, timing, occasion…" style={{resize:"vertical"}}/>
                   </div>
                 )}
 
@@ -660,7 +895,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                   )}
                 </div>
                 <p style={{fontSize:11,color:"#333",textAlign:"center",lineHeight:1.7}}>
-                  {isRental ? "Next: review rental contract, upload documents, sign." : "You'll get a confirmation email · We'll reach out within 60 minutes."}
+                  {isRental ? "Next: review rental contract, upload documents, sign." : "You'll get a confirmation email · We'll reach out within 5 minutes."}
                 </p>
               </div>
             )}
@@ -740,7 +975,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                     {submitting ? "Submitting…" : "Sign & Submit Booking ✓"}
                   </button>
                 </div>
-                <p style={{fontSize:11,color:"#333",textAlign:"center",lineHeight:1.7}}>By submitting, your booking + signed agreement + documents go to Auto Realm. We confirm within 60 minutes.</p>
+                <p style={{fontSize:11,color:"#333",textAlign:"center",lineHeight:1.7}}>By submitting, your booking + signed agreement + documents go to Auto Realm. We confirm within 5 minutes.</p>
               </div>
             )}
           </>
@@ -753,6 +988,8 @@ function BookModal({ open, onClose, initCar, initSvc }) {
 export default function AutoRealm() {
   const [cat, setCat] = useState("all");
   const [per, setPer] = useState(0);
+  const [transferTier, setTransferTier] = useState("first");
+  useLiveChat();
   const [bookOpen, setBookOpen] = useState(false);
   const [initCar, setInitCar] = useState(null);
   const [initSvc, setInitSvc] = useState("rental");
@@ -799,6 +1036,7 @@ export default function AutoRealm() {
           {[["Fleet","fleet"],["On Demand","ondemand"],["Chauffeur","chauffeur"],["Transfers","transfers"],["FIFA 2026","fifa"],["Imports","imports"]].map(([l,id])=>(
             <button key={id} className="nav-lnk" onClick={()=>scroll(id)}>{l}</button>
           ))}
+          <a href="/blog.html" className="nav-lnk" style={{textDecoration:"none"}}>Journal</a>
         </div>
         <button className="btn-gold mob-hide" style={{padding:"10px 26px",borderRadius:6,fontSize:11}} onClick={()=>openBook()}>Book Now</button>
         <button className="mob-only" onClick={()=>setMNav(!mNav)} style={{background:"none",border:"1px solid #222",color:"#fff",padding:"8px 13px",borderRadius:6,cursor:"pointer",fontSize:17}}>{mNav?"✕":"☰"}</button>
@@ -809,6 +1047,7 @@ export default function AutoRealm() {
           {[["Fleet","fleet"],["On Demand","ondemand"],["Chauffeur","chauffeur"],["Transfers","transfers"],["FIFA 2026","fifa"],["Imports","imports"]].map(([l,id])=>(
             <button key={id} className="nav-lnk" style={{textAlign:"left",fontSize:13}} onClick={()=>scroll(id)}>{l}</button>
           ))}
+          <a href="/blog.html" className="nav-lnk" style={{textAlign:"left",fontSize:13,textDecoration:"none"}}>Journal</a>
           <button className="btn-gold" style={{padding:"13px",borderRadius:8,fontSize:13,marginTop:6}} onClick={()=>{setMNav(false);openBook();}}>Book Now</button>
         </div>
       )}
@@ -845,6 +1084,26 @@ export default function AutoRealm() {
         </div>
       </section>
 
+      {/* ───── 5 SEO SERVICE BUTTONS ───── */}
+      <section id="services" style={{ padding:"0 28px", marginTop:"-30px", marginBottom:"20px", position:"relative", zIndex:5 }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:14 }} className="mob-1col">
+            {SERVICES.map(s=>(
+              <div key={s.id} onClick={()=> s.target ? scroll(s.target) : openBook(null, s.svc)}
+                style={{ background:"linear-gradient(160deg,rgba(255,255,255,.03),rgba(255,255,255,0))", border:"1px solid #181818", borderRadius:14, padding:"22px 18px", cursor:"pointer", transition:"all .35s cubic-bezier(.23,1,.32,1)", display:"flex", flexDirection:"column", gap:8 }}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(191,149,63,.4)";e.currentTarget.style.transform="translateY(-6px)";e.currentTarget.style.background="linear-gradient(160deg,rgba(191,149,63,.06),rgba(191,149,63,.01))";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="#181818";e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.background="linear-gradient(160deg,rgba(255,255,255,.03),rgba(255,255,255,0))";}}>
+                <div style={{ fontSize:26 }}>{s.icon}</div>
+                <div className="sr" style={{ fontSize:18, fontWeight:600, color:"#fff", lineHeight:1.15 }}>{s.label}</div>
+                <div style={{ fontSize:9.5, letterSpacing:".04em", color:G, textTransform:"uppercase", fontWeight:500 }}>{s.seo}</div>
+                <div style={{ fontSize:12, color:"#777", lineHeight:1.5 }}>{s.desc}</div>
+                <div style={{ marginTop:"auto", paddingTop:8, fontSize:11, color:"#666" }}>Get started <span style={{color:G}}>→</span></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Sec id="fleet">
         <div style={{marginBottom:52}}>
           <div style={stag}>The Collection</div>
@@ -874,9 +1133,9 @@ export default function AutoRealm() {
               <div>
                 <div style={{...stag,color:G,marginBottom:14}}>🔑 Beyond Our Fleet</div>
                 <h2 className="sr" style={{...stitle,marginBottom:18}}>Any Car. <span className="gold-text">On Demand.</span></h2>
-                <p style={{color:"#666",fontSize:15,lineHeight:1.85,marginBottom:28,maxWidth:520}}>Want a Lamborghini Urus for your wedding? Rolls Royce Cullinan for a music video? G-Wagon Brabus for a weekend? We source any exotic, luxury, or specialty vehicle on request — short or long term.</p>
+                <p style={{color:"#666",fontSize:15,lineHeight:1.85,marginBottom:28,maxWidth:520}}>Want a Lamborghini Urus for your wedding? A party bus for the crew? A private jet, stretch limousine, or Sprinter van for the whole group? We source any exotic, luxury, or specialty vehicle on request — short or long term.</p>
                 <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:32}}>
-                  {["Lamborghini, Ferrari, McLaren, Porsche","Rolls Royce, Bentley, Maybach","G-Wagon, Cullinan, Urus, Defender","Any year, any spec, any color","Daily, weekly, or monthly terms"].map(f=>(
+                  {["Lamborghini, Ferrari, McLaren, Porsche","Rolls Royce, Bentley, Maybach","Party Buses & Stretch Limousines","Mercedes Sprinter Vans & Shuttles","Private Jets & Yacht Charters","Any year, any spec, any color"].map(f=>(
                     <div key={f} style={{display:"flex",gap:12,alignItems:"center"}}>
                       <div style={{width:5,height:5,borderRadius:"50%",background:G,flexShrink:0}}/>
                       <span style={{fontSize:13,color:"#777"}}>{f}</span>
@@ -888,7 +1147,7 @@ export default function AutoRealm() {
               <div style={{ background:"#0d0d0d", border:"1px solid #1c1c1c", borderRadius:14, padding:"30px", textAlign:"center" }}>
                 <div style={{fontSize:54,marginBottom:14,opacity:.9}}>🔑</div>
                 <div className="sr" style={{fontSize:22,fontWeight:500,marginBottom:10}}>Average Response</div>
-                <div className="sr gold-text" style={{fontSize:48,fontWeight:600,lineHeight:1,marginBottom:6}}>&lt; 2 hrs</div>
+                <div className="sr gold-text" style={{fontSize:48,fontWeight:600,lineHeight:1,marginBottom:6}}>&lt; 5 min</div>
                 <p style={{fontSize:12,color:"#555",marginTop:14,lineHeight:1.7}}>From request to quote. We work fast because you need to drive faster.</p>
               </div>
             </div>
@@ -952,33 +1211,40 @@ export default function AutoRealm() {
       </section>
 
       <Sec id="transfers" style={{background:"#080808"}}>
-        <div style={{textAlign:"center",marginBottom:56}}>
+        <div style={{textAlign:"center",marginBottom:36}}>
           <div style={stag}>Flat-Rate · No Surge Pricing</div>
           <div style={{...divider,margin:"14px auto"}}/>
           <h2 className="sr" style={stitle}>Airport Transfers</h2>
-          <p style={{color:"#4a4a4a",fontSize:15,marginTop:12,maxWidth:420,margin:"12px auto 0",lineHeight:1.8}}>Fixed flat rates — no surprises, no meter running. Plus gratuity.</p>
+          <p style={{color:"#4a4a4a",fontSize:15,marginTop:12,maxWidth:420,margin:"12px auto 0",lineHeight:1.8}}>JFK · LGA · EWR. Choose your class of service.</p>
         </div>
-        <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",minWidth:500}}>
-            <thead>
-              <tr style={{borderBottom:"1px solid #181818"}}>
-                {["Route","Mercedes S580","Escalade / Suburban","Note"].map((h,i)=>(<th key={h} style={{ padding:"12px 20px",fontSize:10,color:"#383838", letterSpacing:".12em",textTransform:"uppercase",fontWeight:500, textAlign:i===0?"left":i===3?"right":"center" }}>{h}</th>))}
-              </tr>
-            </thead>
-            <tbody>
-              {TRANSFERS.map((t,i)=>(
-                <tr key={t.route} style={{borderBottom:"1px solid #111",background:i%2?"rgba(255,255,255,.01)":"transparent"}}>
-                  <td style={{padding:"22px 20px",fontSize:16,fontWeight:500,letterSpacing:".02em"}}>{t.route}</td>
-                  <td style={{padding:"22px 20px",textAlign:"center"}}><span className="sr gold-text" style={{fontSize:26,fontWeight:600}}>${t.s580}</span></td>
-                  <td style={{padding:"22px 20px",textAlign:"center"}}><span style={{fontSize:22,color:"#bbb",fontWeight:500}}>${t.esc}</span></td>
-                  <td style={{padding:"22px 20px",textAlign:"right",fontSize:12,color:"#3a3a3a"}}>+ Gratuity</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {/* First / Business toggle */}
+        <div style={{display:"flex",justifyContent:"center",marginBottom:32}}>
+          <div style={{display:"inline-flex",background:"#0f0f0f",border:"1px solid #1c1c1c",borderRadius:30,padding:4,gap:4}}>
+            {[["first","First Class"],["business","Business Class"]].map(([v,l])=>(
+              <button key={v} onClick={()=>setTransferTier(v)} style={{background:transferTier===v?`linear-gradient(135deg,${G},#FCF6BA,${G})`:"transparent",color:transferTier===v?"#000":"#888",border:"none",fontSize:12,letterSpacing:".06em",textTransform:"uppercase",padding:"10px 26px",borderRadius:24,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:transferTier===v?600:500,transition:"all .25s"}}>{l}</button>
+            ))}
+          </div>
         </div>
-        <div style={{textAlign:"center",marginTop:44}}>
-          <button className="btn-gold" style={{padding:"14px 44px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"transfer")}>Book a Transfer</button>
+
+        <div style={{maxWidth:760,margin:"0 auto",background:"#0d0d0d",border:"1px solid #1c1c1c",borderRadius:18,padding:"32px 30px"}}>
+          <div style={{textAlign:"center",marginBottom:22}}>
+            <div style={{fontSize:13,color:G,letterSpacing:".08em",textTransform:"uppercase",fontWeight:600,marginBottom:6}}>{TRANSFER_CLASSES[transferTier].tag}</div>
+            <p style={{fontSize:13.5,color:"#888",lineHeight:1.6,maxWidth:480,margin:"0 auto"}}>{TRANSFER_CLASSES[transferTier].desc}</p>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}} className="mob-1col">
+            {TRANSFER_CLASSES[transferTier].rates.map(r=>(
+              <div key={r.route} style={{background:"rgba(255,255,255,.02)",border:"1px solid #1a1a1a",borderRadius:12,padding:"20px 16px",textAlign:"center"}}>
+                <div style={{fontSize:11,color:"#777",letterSpacing:".05em",marginBottom:8}}>{r.route}</div>
+                <div className="sr gold-text" style={{fontSize:26,fontWeight:600}}>{r.price}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{textAlign:"center",fontSize:11,color:"#3a3a3a",marginTop:18}}>+ Gratuity · Flat rate, no meter</p>
+        </div>
+
+        <div style={{textAlign:"center",marginTop:36}}>
+          <button className="btn-gold" style={{padding:"14px 44px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"transfer")}>Book {TRANSFER_CLASSES[transferTier].label} Transfer</button>
         </div>
       </Sec>
 
