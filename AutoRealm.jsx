@@ -1356,6 +1356,21 @@ export default function AutoRealm() {
             </div>
           </div>
         </div>
+        <div style={{marginTop:64}}>
+            <div style={{textAlign:"center",marginBottom:28}}>
+              <div style={stag}>From the Auction to Your Driveway</div>
+              <div style={{...divider,margin:"12px auto"}}/>
+              <h3 className="sr" style={{fontSize:26,fontWeight:500}}>Recent Imports</h3>
+              <p style={{color:"#4a4a4a",fontSize:13,marginTop:10,maxWidth:420,margin:"10px auto 0",lineHeight:1.7}}>Real JDM vehicles we sourced in Japan and delivered stateside — titled, plated, and road-ready.</p>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}} className="mob-2col">
+              {["jdm-01-acty-white.jpg","jdm-02-container.jpg","jdm-03-pair-sunset.jpg","jdm-04-rear.jpg","jdm-05-interior.jpg"].map((p,i)=>(
+                <div key={i} style={{position:"relative",aspectRatio:"1/1",borderRadius:10,overflow:"hidden",border:"1px solid #181818",background:"#0d0d0d"}}>
+                  <img src={CONFIG.PHOTO_PATH + "/" + p} alt="Auto Realm JDM import" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                </div>
+              ))}
+            </div>
+          </div>
       </Sec>
 
       <footer id="contact" style={{background:"#030303",borderTop:"1px solid #111",padding:"80px 28px 36px"}}>
