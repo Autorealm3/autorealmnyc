@@ -227,7 +227,7 @@ const CARS = [
     d:400, hr:null, w:2500, m:9000, badge:null,
     photos:["c63s-01-nyc-lv.jpg","c63s-02-front-day.jpg","c63s-05-rear.jpg","c63s-04-interior.jpg"],
     g1:"#0e0e0e", g2:"#1a1a1a", acc:"#E63946" },
-  { id:10, name:"BMW M850i Competition", sub:"Fully Blacked Out · M Performance", year:"2019", color:"Triple Black", cat:"sport", drive:"self",
+  { id:10, name:"BMW M850i Coupe", sub:"Fully Blacked Out · M Performance", year:"2019", color:"Triple Black", cat:"sport", drive:"self",
     feats:["Fully Blacked Out","M Sport Package","Crystal Shifter","Cognac Interior","523 HP V8"],
     d:350, hr:null, w:2250, m:9000, badge:null,
     photos:["m850-01-hero-day.jpg","m850-02-rear-day.jpg","m850-06-headlight.jpg","m850-05-interior.jpg"],
@@ -262,9 +262,9 @@ const TRANSFER_CLASSES = {
     tag:"Range Rover · S580 · Escalade",
     desc:"Arrive in flagship luxury. Our top-tier fleet with premium amenities and a professional chauffeur.",
     rates:[
-      { route:"JFK ↔ NYC", price:"From $250" },
+      { route:"JFK ↔ NYC", price:"From $200" },
       { route:"LGA ↔ NYC", price:"From $200" },
-      { route:"EWR ↔ NYC", price:"From $300" },
+      { route:"EWR ↔ NYC", price:"From $220" },
     ],
   },
   business: {
@@ -501,6 +501,14 @@ function BookModal({ open, onClose, initCar, initSvc }) {
     agreedToTerms:false,
   });
   const u = (k,v) => setForm(f=>({...f,[k]:v}));
+
+  // Sync modal to whichever service was chosen each time it opens (fixes On-Demand/JDM opening on "Trip Details")
+  useEffect(() => {
+    if (!open) return;
+    setForm(f => ({ ...f, service: initSvc || "rental", vehicle: initCar?.name || "" }));
+    setStep(initSvc ? 2 : 1);
+    setSuccess(false);
+  }, [open, initSvc, initCar]);
 
   if (!open) return null;
   const isOnDemand = form.service === "ondemand";
@@ -1313,9 +1321,9 @@ export default function AutoRealm() {
             <div style={stag}>Direct from Japan</div>
             <div style={divider}/>
             <h2 className="sr" style={stitle}>Japanese<br/>Imports</h2>
-            <p style={{color:"#4a4a4a",fontSize:15,marginTop:14,lineHeight:1.85,maxWidth:420}}>We source and ship rare JDM vehicles directly from Japan to the USA — door to door. From JDM legends to modern classics, if it rolls in Japan, we can get it here.</p>
+            <p style={{color:"#4a4a4a",fontSize:15,marginTop:14,lineHeight:1.85,maxWidth:420}}>We handle the entire journey — buying the car in Japan, exporting and shipping it to the US, clearing customs, titling it in your name, and getting it registered and plated. Fully turnkey, door to door. If it rolls in Japan, we can get it here — titled, plated, and ready to drive.</p>
             <div style={{marginTop:28,display:"flex",flexDirection:"column",gap:10}}>
-              {["Custom orders from Japan on demand","Full US compliance & inspection","Transparent door-to-door pricing","Rare & limited production vehicles available","Trucks, sports cars & SUVs"].map(f=>(
+              {["Buy from Japan — auction or private sale","Export & ocean shipping handled","US customs clearance & DOT/EPA compliance","US title obtained in your name","Registration & license plates sorted","Trucks, sports cars & SUVs"].map(f=>(
                 <div key={f} style={{display:"flex",gap:12,alignItems:"center"}}>
                   <div style={{width:5,height:5,borderRadius:"50%",background:G,flexShrink:0}}/>
                   <span style={{fontSize:13,color:"#666"}}>{f}</span>
@@ -1336,7 +1344,7 @@ export default function AutoRealm() {
             </div>
             <div style={{background:"#0d0d0d",border:"1px solid #181818",borderRadius:12,padding:"24px"}}>
               <div style={{...stag,marginBottom:16}}>How It Works</div>
-              {[["01","Tell us what you want","JDM model, year, specs"],["02","We source it in Japan","Verified, inspected, auction or private"],["03","We ship & comply","Full customs & US compliance handled"],["04","Delivered to your door","NYC and surrounding areas"]].map(([n,t,d])=>(
+              {[["01","Tell us what you want","JDM model, year, specs & budget"],["02","We buy it in Japan","Auction or private sale, inspected"],["03","Export & ship to the US","Ocean freight, customs cleared"],["04","US title & compliance","DOT/EPA, titled in your name"],["05","Registered & delivered","Plates sorted, door-to-door"]].map(([n,t,d])=>(
                 <div key={n} style={{display:"flex",gap:14,marginBottom:18,alignItems:"flex-start"}}>
                   <div style={{ width:28,height:28,borderRadius:"50%", border:`1px solid ${G}22`, display:"flex",alignItems:"center",justifyContent:"center", fontSize:10,color:G,fontWeight:600,flexShrink:0,marginTop:2 }}>{n}</div>
                   <div>
