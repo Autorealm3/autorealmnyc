@@ -183,23 +183,23 @@ const G = "#BF953F";
 const CARS = [
   { id:1, name:"Mercedes-Benz S580 AMG", sub:"Long Wheelbase · Reclining Package", year:"2024", color:"Obsidian Black", cat:"luxury", drive:"both",
     feats:["S63 AMG Wheels","Reclining Rear Seats","LWB Extended","Cognac Interior","Chauffeur Available"],
-    d:495, hr:125, w:3000, m:12000, badge:"FLAGSHIP", bc:G,
-    photos:["s580-10-hero-night.jpg","s580-02-prada-luxury.jpg","s580-08-side-night-glow.jpg","s580-09-interior-red.jpg","s580-07-side-day-clouds.jpg","s580-04-interior-cognac.jpg","s580-03-door-open-cognac.jpg","s580-05-interior-rear-cognac.jpg"],
+    d:495, hr:145, w:3000, m:12000, badge:"FLAGSHIP", bc:G,
+    photos:["s580-01-front-day.jpg","s580-03-side-day.jpg","s580-06-rear-night.jpg","s580-04-interior-cognac.jpg"],
     g1:"#080808", g2:"#181818", acc:"#BF953F" },
   { id:2, name:"Mercedes-AMG G63", sub:"Satin Black on Red · 577HP V8 Biturbo", year:"2024", color:"Satin Black / Red", cat:"suv", drive:"both",
     feats:["Satin Black on Red","577 HP V8 Biturbo","AMG Performance","G-Manufaktur","Chauffeur Available"],
     d:895, hr:null, w:null, m:null, badge:"NEW", bc:G,
-    photos:[],
+    photos:["g63-01-front.jpg"],
     g1:"#0a0a0a", g2:"#1a1a1a", acc:"#C0392B" },
   { id:3, name:"Lamborghini Urus", sub:"Super SUV · Twin-Turbo V8", year:"2023", color:"Nero Black", cat:"exotic", drive:"both",
     feats:["641 HP Twin-Turbo V8","0-60 in 3.5s","Super SUV","Carbon Package","Chauffeur Available"],
     d:1200, hr:null, w:null, m:null, badge:"EXOTIC", bc:"#C0392B",
-    photos:[],
+    photos:["urus-01-front-green.jpg","urus-02-side-green.jpg","urus-04-front-orange.jpg","urus-03-interior.jpg"],
     g1:"#0a0a0a", g2:"#1a1a1a", acc:"#C0392B" },
-  { id:4, name:"Chevrolet Corvette C8", sub:"Mid-Engine · Black on Red", year:"2025", color:"Black / Red", cat:"sport", drive:"self",
-    feats:["Mid-Engine LT2 V8","495 HP","Black on Red Interior","0-60 in 2.9s","Self-Drive"],
-    d:500, hr:null, w:null, m:null, badge:"NEW", bc:"#E63946",
-    photos:[],
+  { id:4, name:"2026 Corvette C8", sub:"Mid-Engine · Black on Red · Rear Spoiler", year:"2026", color:"Black / Red", cat:"sport", drive:"self",
+    feats:["Mid-Engine LT2 V8","495 HP","Black on Red Interior","Rear Spoiler","0-60 in 2.9s","Self-Drive"],
+    d:500, hr:null, w:null, m:null, badge:"NEW 2026", bc:"#E63946",
+    photos:["corvette-01-front.jpg","corvette-02-side.jpg","corvette-03-rear-spoiler.jpg"],
     g1:"#0e0e0e", g2:"#1a1a1a", acc:"#E63946" },
   { id:5, name:"Range Rover SV", sub:"White on Black · Long Wheelbase", year:"2026", color:"White / Black", cat:"suv", drive:"both",
     feats:["SV Flagship","White on Black","Long Wheelbase","Executive Rear Seats","Chauffeur Available"],
@@ -210,33 +210,38 @@ const CARS = [
   { id:6, name:"Cadillac Escalade ESV", sub:"Premium Luxury · 7-Passenger", year:"2026", color:"Obsidian Black", cat:"suv", drive:"both",
     feats:["Premium Luxury ESV","7 Passenger","Self-Drive or Chauffeur","Airport Transfers","Super Cruise"],
     d:500, hr:150, w:null, m:null, badge:"NEW", bc:G,
-    photos:[],
+    photos:["escalade-01-front.jpg","escalade-02-rear.jpg"],
     g1:"#080808", g2:"#161616", acc:"#BF953F" },
   { id:7, name:"BMW M3 Competition", sub:"Stage 1 Tune · Starlight Headliner", year:"2023", color:"Black", cat:"sport", drive:"self",
     feats:["Stage 1 Tuned","Starlight Headliner","510+ HP","Competition Package","Self-Drive"],
     d:495, hr:null, w:null, m:null, badge:"STAGE 1", bc:"#3A5BDB",
-    photos:[],
+    photos:["m3-01-hero.jpg","m3-02-front.jpg","m3-03-rear.jpg","m3-04-interior.jpg"],
     g1:"#060810", g2:"#0e1020", acc:"#3A5BDB" },
   { id:8, name:"Polaris Slingshot GT", sub:"Limited Edition · #03 of 298 Worldwide", year:"2020", color:"Venom Green", cat:"exotic", drive:"self",
     feats:["#03 of 298 Worldwide","Underglow Lighting","GT Limited Edition","Open-Cockpit","2-Day Minimum"],
     d:300, hr:null, w:2000, m:8000, badge:"#03 / 298 WORLD", bc:"#39FF14", minDays:2,
-    photos:["slingshot-01-hero.jpg","slingshot-04-underglow-multi.jpg","slingshot-02-side.jpg","slingshot-03-front.jpg","slingshot-05-underglow-purple.jpg","slingshot-06-underglow-blue.jpg"],
+    photos:["slingshot-01-front-day.jpg","slingshot-02-side-day.jpg","slingshot-04-underglow-multi.jpg","slingshot-06-underglow-blue.jpg"],
     g1:"#040e04", g2:"#081c08", acc:"#39FF14" },
   { id:9, name:"Mercedes-Benz C63S AMG", sub:"V8 Biturbo · AMG Performance Coupe", year:"2019", color:"Diamond White", cat:"sport", drive:"self",
     feats:["V8 Biturbo 503 HP","Red & Black AMG Interior","AMG Performance Seats","Panoramic Roof","Star Lights Roof"],
     d:400, hr:null, w:2500, m:9000, badge:null,
-    photos:["c63s-01-nyc-louis-vuitton.jpg","c63s-02-front-day.jpg","c63s-03-side-day.jpg","c63s-04-interior-amg.jpg","c63s-05-interior-seats.jpg"],
+    photos:["c63s-01-nyc-lv.jpg","c63s-02-front-day.jpg","c63s-05-rear.jpg","c63s-04-interior.jpg"],
     g1:"#0e0e0e", g2:"#1a1a1a", acc:"#E63946" },
   { id:10, name:"BMW M850i Competition", sub:"Fully Blacked Out · M Performance", year:"2019", color:"Triple Black", cat:"sport", drive:"self",
     feats:["Fully Blacked Out","M Sport Package","Crystal Shifter","Cognac Interior","523 HP V8"],
     d:350, hr:null, w:2250, m:9000, badge:null,
-    photos:["m850-01-hero-day.jpg","m850-03-front-sunset.jpg","m850-02-rear-day.jpg","m850-05-interior.jpg","m850-04-taillight.jpg","m850-06-headlight.jpg","m850-07-shifter.jpg"],
+    photos:["m850-01-hero-day.jpg","m850-02-rear-day.jpg","m850-06-headlight.jpg","m850-05-interior.jpg"],
     g1:"#060810", g2:"#0e1020", acc:"#3A5BDB" },
   { id:11, name:"Range Rover Sport SVR", sub:"Estoril Blue · Supercharged V8 575HP", year:"2017", color:"Estoril Blue", cat:"suv", drive:"self",
     feats:["Supercharged V8 575HP","SVR Performance Seats","Panoramic Roof","Carbon Trim","Active Sport Exhaust"],
     d:375, hr:null, w:2500, m:10000, badge:null,
-    photos:["svr-01-driveway-hero.jpg","svr-02-front-grille.jpg","svr-03-rear-quarter.jpg","svr-04-svr-seats.jpg","svr-05-svr-seats-detail.jpg"],
+    photos:["svr-01-front.jpg","svr-02-side.jpg","svr-03-rear.jpg","svr-04-seats.jpg"],
     g1:"#0a1428", g2:"#142850", acc:"#2E5BFF" },
+  { id:12, name:"Rolls-Royce Cullinan", sub:"Black Badge · V12 Ultra-Luxury", year:"2023", color:"Black / Blue", cat:"exotic", drive:"both",
+    feats:["6.75L V12","Black Badge","Starlight Headliner","Chauffeur Available","Ultra-Luxury SUV"],
+    d:2500, hr:null, w:null, m:null, badge:"FLAGSHIP", bc:G,
+    photos:["cullinan-01-front.jpg","cullinan-02-blue.jpg"],
+    g1:"#080808", g2:"#181818", acc:"#BF953F" },
 ];
 
 const CATS = [
@@ -1166,7 +1171,7 @@ export default function AutoRealm() {
               <div style={{marginTop:36,display:"flex",flexDirection:"column",gap:10}}>
                 {[
                   {i:"✈️", t:"Airport Transfers", d:"JFK · LGA · Newark — flat rates + gratuity", fn:()=>scroll("transfers")},
-                  {i:"⏱", t:"Hourly Chauffeur", d:"S580 from $125/hr · Escalade from $150/hr · 3hr min", fn:()=>openBook(null,"chauffeur")},
+                  {i:"⏱", t:"Hourly Chauffeur", d:"S580 from $145/hr · Escalade from $150/hr · 4hr min", fn:()=>openBook(null,"chauffeur")},
                   {i:"🎓", t:"Prom & Events", d:"Full packages with photoshoot — from $400", fn:()=>scroll("events")},
                   {i:"⚽", t:"FIFA 2026 Packages", d:"Game-day arrivals — book your match-day ride now", fn:()=>openBook(null,"chauffeur")},
                   {i:"📸", t:"Photoshoot & Content", d:"Hourly packages with scenic routes around NYC", fn:()=>openBook(null,"chauffeur")},
@@ -1185,8 +1190,8 @@ export default function AutoRealm() {
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:16}}>
               {[
-                {name:"Mercedes-Benz S580 AMG", detail:"Self-Drive: $495/day · 12-Hour Full Day Chauffeur: $1,100 + tax", hourly:"$125/hr", min:"3-hr min", extra:"Tips excluded · Full-day chauffeur available"},
-                {name:"Cadillac Escalade / Suburban", detail:"7-passenger premium SUV · Self-drive $395/day", hourly:"$150/hr", min:"2-hr min", extra:"Available for self-rental & chauffeur"},
+                {name:"Mercedes-Benz S580 AMG", detail:"Self-Drive: $495/day · 10-Hour Full Day Chauffeur: $1,250 + tax", hourly:"$145/hr", min:"4-hr min", extra:"Tips excluded · Full-day chauffeur available"},
+                {name:"Cadillac Escalade / Suburban", detail:"7-passenger premium SUV · Self-Drive $500/day · 10-Hour Full Day: $1,500 + tax", hourly:"$150/hr", min:"4-hr min", extra:"Available for self-rental & chauffeur"},
               ].map(v=>(
                 <div key={v.name} style={{ background:"#0d0d0d",border:"1px solid #181818",borderRadius:12,padding:"24px 28px" }}>
                   <div className="sr" style={{fontSize:20,fontWeight:500,marginBottom:8,letterSpacing:".02em"}}>{v.name}</div>
@@ -1203,7 +1208,7 @@ export default function AutoRealm() {
               ))}
               <div style={{ background:"rgba(191,149,63,.05)",border:"1px solid rgba(191,149,63,.15)", borderRadius:10,padding:"18px 22px" }}>
                 <div style={{fontSize:12,color:G,fontWeight:600,letterSpacing:".08em",marginBottom:6}}>⭐ Full Day Package</div>
-                <div style={{fontSize:13,color:"#666",lineHeight:1.7}}>12-hour Mercedes S580 chauffeur day for <strong style={{color:"#bbb"}}>$1,100 + tax</strong>. Perfect for weddings, corporate, and city tours.</div>
+                <div style={{fontSize:13,color:"#666",lineHeight:1.7}}>10-hour Mercedes S580 chauffeur day for <strong style={{color:"#bbb"}}>$1,250 + tax</strong> · Escalade 10-hour day <strong style={{color:"#bbb"}}>$1,500 + tax</strong>. Perfect for weddings, corporate, and city tours.</div>
               </div>
             </div>
           </div>
