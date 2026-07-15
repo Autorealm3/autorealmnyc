@@ -184,7 +184,7 @@ const CARS = [
   { id:1, name:"Mercedes-Benz S580 AMG", sub:"Long Wheelbase · Reclining Package", year:"2024", color:"Obsidian Black", cat:"luxury", drive:"both",
     feats:["S63 AMG Wheels","Reclining Rear Seats","LWB Extended","Cognac Interior","Chauffeur Available"],
     d:495, hr:145, w:3000, m:12000, badge:"FLAGSHIP", bc:G,
-    photos:["s580-01-front-day.jpg","s580-03-side-day.jpg","s580-06-rear-night.jpg","s580-04-interior-cognac.jpg"],
+    photos:["s580-01-front-day.jpg","s580-03-side-day.jpg","s580-07-interior-red.jpg","s580-06-rear-night.jpg","s580-04-interior-cognac.jpg"],
     g1:"#080808", g2:"#181818", acc:"#BF953F" },
   { id:2, name:"Mercedes-AMG G63", sub:"Satin Black on Red · 577HP V8 Biturbo", year:"2024", color:"Satin Black / Red", cat:"suv", drive:"both",
     feats:["Satin Black on Red","577 HP V8 Biturbo","AMG Performance","G-Manufaktur","Chauffeur Available"],
@@ -205,7 +205,7 @@ const CARS = [
     feats:["SV Flagship","White on Black","Long Wheelbase","Executive Rear Seats","Chauffeur Available"],
     d:null, hr:200, w:null, m:null, badge:"FLAGSHIP SUV", bc:G,
     transfer:{ jfk:250, ewr:300 },
-    photos:[],
+    photos:["rrsv-01-front.jpg"],
     g1:"#0a0a0a", g2:"#181818", acc:"#BF953F" },
   { id:6, name:"Cadillac Escalade ESV", sub:"Premium Luxury · 7-Passenger", year:"2026", color:"Obsidian Black", cat:"suv", drive:"both",
     feats:["Premium Luxury ESV","7 Passenger","Self-Drive or Chauffeur","Airport Transfers","Super Cruise"],
@@ -1364,7 +1364,7 @@ export default function AutoRealm() {
               <p style={{color:"#4a4a4a",fontSize:13,marginTop:10,maxWidth:420,margin:"10px auto 0",lineHeight:1.7}}>Real JDM vehicles we sourced in Japan and delivered stateside — titled, plated, and road-ready.</p>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}} className="mob-2col">
-              {["jdm-01-acty-white.jpg","jdm-02-container.jpg","jdm-03-pair-sunset.jpg","jdm-04-rear.jpg","jdm-05-interior.jpg"].map((p,i)=>(
+              {["jdm-01-skyline-r32.jpg","jdm-02-nissan-president.jpg","jdm-03-kei-trucks.jpg","jdm-04-car-carrier.jpg","jdm-05-nikko-yard.jpg"].map((p,i)=>(
                 <div key={i} style={{position:"relative",aspectRatio:"1/1",borderRadius:10,overflow:"hidden",border:"1px solid #181818",background:"#0d0d0d"}}>
                   <img src={CONFIG.PHOTO_PATH + "/" + p} alt="Auto Realm JDM import" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                 </div>
