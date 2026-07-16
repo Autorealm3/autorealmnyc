@@ -224,7 +224,7 @@ const CARS = [
     g1:"#040e04", g2:"#081c08", acc:"#39FF14" },
   { id:9, name:"Mercedes-Benz C63S AMG", sub:"V8 Biturbo · AMG Performance Coupe", year:"2019", color:"Diamond White", cat:"sport", drive:"self",
     feats:["V8 Biturbo 503 HP","Red & Black AMG Interior","AMG Performance Seats","Panoramic Roof","Star Lights Roof"],
-    d:400, hr:null, w:2500, m:9000, badge:null,
+    d:400, hr:null, w:2500, m:9000, badge:"✦ STARLIGHT ROOF",
     photos:["c63s-01-nyc-lv.jpg","c63s-02-front-day.jpg","c63s-05-rear.jpg","c63s-04-interior.jpg"],
     g1:"#0e0e0e", g2:"#1a1a1a", acc:"#E63946" },
   { id:10, name:"BMW M850i Coupe", sub:"Fully Blacked Out · M Performance", year:"2019", color:"Triple Black", cat:"sport", drive:"self",
