@@ -634,7 +634,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                       {id:"rental",l:"🚗 Self-Drive Rental"},
                       {id:"chauffeur",l:"👔 Chauffeur / Limo"},
                       {id:"transfer",l:"✈️ Airport Transfer"},
-                      {id:"fifa",l:"⚽ FIFA 2026"},
+                      
                       {id:"ondemand",l:"🔑 Car on Demand"},
                       {id:"import",l:"🇯🇵 JDM Import"},
                     ].map(s=>(
@@ -1046,7 +1046,7 @@ export default function AutoRealm() {
           </div>
         </div>
         <div className="mob-hide" style={{display:"flex",alignItems:"center",gap:28}}>
-          {[["Fleet","fleet"],["On Demand","ondemand"],["Chauffeur","chauffeur"],["Transfers","transfers"],["FIFA 2026","fifa"],["Imports","imports"]].map(([l,id])=>(
+          {[["Fleet","fleet"],["On Demand","ondemand"],["Chauffeur","chauffeur"],["Transfers","transfers"],["Imports","imports"]].map(([l,id])=>(
             <button key={id} className="nav-lnk" onClick={()=>scroll(id)}>{l}</button>
           ))}
           <a href="/blog.html" className="nav-lnk" style={{textDecoration:"none"}}>Journal</a>
@@ -1057,7 +1057,7 @@ export default function AutoRealm() {
 
       {mNav && (
         <div style={{ position:"fixed",top:68,left:0,right:0,zIndex:800, background:"#0a0a0a",borderBottom:"1px solid #181818", padding:"20px 24px",display:"flex",flexDirection:"column",gap:14 }}>
-          {[["Fleet","fleet"],["On Demand","ondemand"],["Chauffeur","chauffeur"],["Transfers","transfers"],["FIFA 2026","fifa"],["Imports","imports"]].map(([l,id])=>(
+          {[["Fleet","fleet"],["On Demand","ondemand"],["Chauffeur","chauffeur"],["Transfers","transfers"],["Imports","imports"]].map(([l,id])=>(
             <button key={id} className="nav-lnk" style={{textAlign:"left",fontSize:13}} onClick={()=>scroll(id)}>{l}</button>
           ))}
           <a href="/blog.html" className="nav-lnk" style={{textAlign:"left",fontSize:13,textDecoration:"none"}}>Journal</a>
@@ -1076,7 +1076,7 @@ export default function AutoRealm() {
         <div className="fu4" style={{display:"flex",gap:14,flexWrap:"wrap",justifyContent:"center"}}>
           <button className="btn-gold" style={{padding:"14px 38px",borderRadius:8,fontSize:12}} onClick={()=>scroll("fleet")}>Explore Fleet</button>
           <button className="btn-ghost" style={{padding:"14px 38px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"chauffeur")}>Book Chauffeur</button>
-          <button className="btn-white" style={{padding:"14px 38px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"ondemand")}>Car on Demand ↗</button>
+          <button className="btn-white" style={{padding:"14px 38px",borderRadius:8,fontSize:12}} onClick={()=>scroll("imports")}>Japanese Imports ↗</button>
         </div>
         <div className="fu4" style={{ display:"flex",gap:0,marginTop:72, border:"1px solid rgba(255,255,255,.05)",borderRadius:12, background:"rgba(255,255,255,.02)",backdropFilter:"blur(6px)", overflow:"hidden",flexWrap:"wrap" }}>
           {[
@@ -1283,39 +1283,26 @@ export default function AutoRealm() {
               </div>
             ))}
           </div>
-          <div id="fifa" style={{ marginTop:48, background:"linear-gradient(135deg,rgba(191,149,63,.10),rgba(191,149,63,.03))", border:"1px solid rgba(191,149,63,.25)",borderRadius:18, padding:"44px 40px", position:"relative", overflow:"hidden" }}>
-            <div style={{ position:"absolute", top:-80, right:-80, width:280, height:280, borderRadius:"50%", background:`radial-gradient(circle, rgba(191,149,63,.15), transparent 70%)`, pointerEvents:"none" }}/>
-            <div style={{position:"relative"}}>
-              <div style={{fontSize:11,letterSpacing:".18em",color:G,textTransform:"uppercase",fontWeight:600,marginBottom:10}}>⚽ FIFA World Cup 2026 · NYC · MetLife Stadium</div>
-              <h2 className="sr" style={{fontSize:"clamp(28px,4vw,40px)",fontWeight:400,marginBottom:12,letterSpacing:".01em",lineHeight:1.2}}>FIFA World Cup 2026 <span className="gold-text">Chauffeur</span></h2>
-              <p style={{fontSize:15,color:"#888",lineHeight:1.7,maxWidth:620,marginBottom:28}}>
-                Seamless luxury transport to MetLife Stadium. Book early — the world is coming to NYC and demand will be unprecedented.
-              </p>
-
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:20,marginBottom:32}}>
-                {[
-                  {i:"✈️", t:"International VIP Service", d:"Airport transfers from JFK, LGA & EWR — flat rates, white-glove pickup, multilingual support"},
-                  {i:"🌎", t:"Global Fleet Experience", d:"Japanese imports, exotics & premium luxury vehicles to match every taste and culture"},
-                  {i:"🗣", t:"Multilingual Chauffeurs", d:"Serving clients from around the world — English, Spanish, Urdu, Hindi, Arabic, French available"},
-                ].map(b=>(
-                  <div key={b.t} style={{background:"rgba(0,0,0,.35)",border:"1px solid rgba(191,149,63,.15)",borderRadius:12,padding:"22px 24px"}}>
-                    <div style={{fontSize:24,marginBottom:10}}>{b.i}</div>
-                    <div className="sr" style={{fontSize:17,fontWeight:500,marginBottom:8,letterSpacing:".01em"}}>{b.t}</div>
-                    <div style={{fontSize:12,color:"#666",lineHeight:1.7}}>{b.d}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{display:"flex",gap:14,flexWrap:"wrap"}}>
-                <button className="btn-gold" style={{padding:"15px 38px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"fifa")}>Book FIFA Package →</button>
-                <button className="btn-ghost" style={{padding:"15px 38px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"transfer")}>Airport Transfer</button>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <Sec id="imports">
+        <div style={{marginTop:64}}>
+            <div style={{textAlign:"center",marginBottom:28}}>
+              <div style={stag}>From the Auction to Your Driveway</div>
+              <div style={{...divider,margin:"12px auto"}}/>
+              <h3 className="sr" style={{fontSize:26,fontWeight:500}}>Recent Imports</h3>
+              <p style={{color:"#4a4a4a",fontSize:13,marginTop:10,maxWidth:420,margin:"10px auto 0",lineHeight:1.7}}>Real JDM vehicles we sourced in Japan and delivered stateside — titled, plated, and road-ready.</p>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}} className="mob-2col">
+              {["jdm-01-skyline-r32.jpg","jdm-02-nissan-president.jpg","jdm-03-kei-trucks.jpg","jdm-04-car-carrier.jpg","jdm-05-nikko-yard.jpg"].map((p,i)=>(
+                <div key={i} style={{position:"relative",aspectRatio:"1/1",borderRadius:10,overflow:"hidden",border:"1px solid #181818",background:"#0d0d0d"}}>
+                  <img src={CONFIG.PHOTO_PATH + "/" + p} alt="Auto Realm JDM import" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                </div>
+              ))}
+            </div>
+          </div>
+
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:72,alignItems:"center"}} className="mob-1col">
           <div>
             <div style={stag}>Direct from Japan</div>
@@ -1332,7 +1319,7 @@ export default function AutoRealm() {
             </div>
             <div style={{display:"flex",gap:14,marginTop:38,flexWrap:"wrap"}}>
               <button className="btn-gold" style={{padding:"14px 32px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"import")}>Inquire Now</button>
-              <button className="btn-ghost" style={{padding:"14px 32px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"import")}>Order a Car</button>
+              <button className="btn-ghost" style={{padding:"14px 32px",borderRadius:8,fontSize:12}} onClick={()=>openBook(null,"import")}>Buy Now</button>
             </div>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:14}}>
@@ -1356,21 +1343,6 @@ export default function AutoRealm() {
             </div>
           </div>
         </div>
-        <div style={{marginTop:64}}>
-            <div style={{textAlign:"center",marginBottom:28}}>
-              <div style={stag}>From the Auction to Your Driveway</div>
-              <div style={{...divider,margin:"12px auto"}}/>
-              <h3 className="sr" style={{fontSize:26,fontWeight:500}}>Recent Imports</h3>
-              <p style={{color:"#4a4a4a",fontSize:13,marginTop:10,maxWidth:420,margin:"10px auto 0",lineHeight:1.7}}>Real JDM vehicles we sourced in Japan and delivered stateside — titled, plated, and road-ready.</p>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12}} className="mob-2col">
-              {["jdm-01-skyline-r32.jpg","jdm-02-nissan-president.jpg","jdm-03-kei-trucks.jpg","jdm-04-car-carrier.jpg","jdm-05-nikko-yard.jpg"].map((p,i)=>(
-                <div key={i} style={{position:"relative",aspectRatio:"1/1",borderRadius:10,overflow:"hidden",border:"1px solid #181818",background:"#0d0d0d"}}>
-                  <img src={CONFIG.PHOTO_PATH + "/" + p} alt="Auto Realm JDM import" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                </div>
-              ))}
-            </div>
-          </div>
       </Sec>
 
       <footer id="contact" style={{background:"#030303",borderTop:"1px solid #111",padding:"80px 28px 36px"}}>
@@ -1440,7 +1412,7 @@ export default function AutoRealm() {
         {[
           {l:"Rental",  i:"🚗", svc:"rental"},
           {l:"Chauffeur", i:"👔", svc:"chauffeur"},
-          {l:"FIFA 2026", i:"⚽", svc:"fifa"},
+          {l:"Car on Demand", i:"🔑", svc:"ondemand"},
         ].map(b=>(
           <button key={b.svc} onClick={()=>openBook(null,b.svc)} style={{
             flex:1, background:"linear-gradient(135deg,#BF953F,#FCF6BA,#BF953F)",
@@ -1455,7 +1427,7 @@ export default function AutoRealm() {
         ))}
       </div>
 
-      <BookModal open={bookOpen} onClose={closeBook} initCar={initCar} initSvc={initSvc}/>
+      <BookModal key={initSvc+"-"+(bookOpen?"o":"c")} open={bookOpen} onClose={closeBook} initCar={initCar} initSvc={initSvc}/>
     </div>
   );
 }
