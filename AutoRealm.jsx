@@ -530,7 +530,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
 
   const submit = async () => {
     setSubmitting(true);
-    const labels = { rental:"Self-Drive Rental", chauffeur:"Chauffeur Service", transfer:"Airport Transfer", fifa:"FIFA 2026 Package", import:"JDM Import Inquiry", ondemand:"Car on Demand Inquiry" };
+    const labels = { rental:"Self-Drive Rental", chauffeur:"Chauffeur Service", transfer:"Airport Transfer", fifa:"Event Package", import:"JDM Import Inquiry", ondemand:"Car on Demand Inquiry" };
     const payload = {
       type: labels[form.service] || "Booking",
       service: form.service,
@@ -887,7 +887,7 @@ function BookModal({ open, onClose, initCar, initSvc }) {
                 </div>
                 <div style={{background:"#080808",border:"1px solid #181818",borderRadius:8,padding:"16px 18px",fontSize:13,color:"#555",lineHeight:1.9}}>
                   <div style={{color:G,fontSize:10,letterSpacing:".12em",textTransform:"uppercase",fontWeight:600,marginBottom:8}}>Summary</div>
-                  <div>Service: <span style={{color:"#bbb"}}>{form.service==="ondemand"?"Car on Demand":form.service==="import"?"JDM Import":form.service==="fifa"?"FIFA 2026":form.service.charAt(0).toUpperCase()+form.service.slice(1)}</span></div>
+                  <div>Service: <span style={{color:"#bbb"}}>{form.service==="ondemand"?"Car on Demand":form.service==="import"?"JDM Import":form.service==="fifa"?"Event":form.service.charAt(0).toUpperCase()+form.service.slice(1)}</span></div>
                   {form.vehicle && !isCarRequest && <div>Vehicle: <span style={{color:"#bbb"}}>{form.vehicle}</span></div>}
                   {isCarRequest && form.carMake && <div>Want: <span style={{color:"#bbb"}}>{form.carYear} {form.carMake} {form.carModel} {form.carColor?`(${form.carColor})`:""}</span></div>}
                   {form.pickup && <div>Pickup: <span style={{color:"#bbb"}}>{form.pickup}{form.pickupZip&&`, ${form.pickupZip}`}</span></div>}
@@ -1181,7 +1181,7 @@ export default function AutoRealm() {
                   {i:"✈️", t:"Airport Transfers", d:"JFK · LGA · Newark — flat rates + gratuity", fn:()=>scroll("transfers")},
                   {i:"⏱", t:"Hourly Chauffeur", d:"S580 from $145/hr · Escalade from $150/hr · 4hr min", fn:()=>openBook(null,"chauffeur")},
                   {i:"🎓", t:"Prom & Events", d:"Full packages with photoshoot — from $400", fn:()=>scroll("events")},
-                  {i:"⚽", t:"FIFA 2026 Packages", d:"Game-day arrivals — book your match-day ride now", fn:()=>openBook(null,"chauffeur")},
+                  {i:"🔑", t:"Car on Demand", d:"Any exotic or luxury vehicle, sourced on request", fn:()=>openBook(null,"ondemand")},
                   {i:"📸", t:"Photoshoot & Content", d:"Hourly packages with scenic routes around NYC", fn:()=>openBook(null,"chauffeur")},
                 ].map(s=>(
                   <div key={s.t} className="svc-row" onClick={s.fn}>
@@ -1365,7 +1365,7 @@ export default function AutoRealm() {
             </div>
             <div>
               <div style={{...stag,marginBottom:18}}>Services</div>
-              {["Exotic Rentals","Chauffeur Service","Airport Transfers","Prom Packages","FIFA 2026","JDM Imports","Car on Demand"].map(s=>(<div key={s} style={{fontSize:12,color:"#383838",marginBottom:10,cursor:"pointer"}}>{s}</div>))}
+              {["Exotic Rentals","Chauffeur Service","Airport Transfers","Prom Packages","JDM Imports","Car on Demand"].map(s=>(<div key={s} style={{fontSize:12,color:"#383838",marginBottom:10,cursor:"pointer"}}>{s}</div>))}
             </div>
             <div>
               <div style={{...stag,marginBottom:18}}>Contact</div>
